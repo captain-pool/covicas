@@ -1,0 +1,7 @@
+__pycache__/
+env/
+db/
+saved_model.yml
+*.dat
+*.json
+*.txt
