@@ -25,8 +25,10 @@ class Extract:
                 assert os.path.exists(source)
             if not raspi:
                 self.cap = cv2.VideoCapture(source)
+                print("Selecting webcam ...")
             else:
                 self.cap = picap.Capture()
+                print("Selecting PiCam ...")
         except AssertionError:
             print("Invalid or Non Existent Source")
             raise
@@ -65,7 +67,7 @@ class Extract:
                     if self.out_channel == 2:
                         aligned = cv2.cvtColor(aligned,cv2.COLOR_BGR2GRAY)
                     bb = face_utils.rect_to_bb(rect)
-                    return bb,aligned,img
-                return img
+                    return bb,aligned,img,len(rects)
+                return img,0
     def close(self):
         self.cap.release()

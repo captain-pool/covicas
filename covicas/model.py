@@ -68,7 +68,7 @@ class LBPHClassifier:
         self.model.train(images,labels)
         print("[DONE]")
         sett = settings()
-        self.model.save(sett.get("weightsFile","saved_model.yml"))
+        self.model.write(sett.get("weightsFile","saved_model.yml"))
     def predict(self,frame,bb):
         sett = settings()
         if not self.__lmap:
@@ -84,23 +84,34 @@ class LBPHClassifier:
         return_dict["w"] = bb[2]
         return_dict["h"] = bb[3]
         return return_dict
-
+    def __fetch_generator(self):
+        try:
+            return next(self._fgen)
+        except:
+            raise
     def _read_live_frames(self):
+        
         while True:
-            try:
-                i = next(self._fgen)
-            except:
-                raise
-            if len(i) == 3:
-                label = self.predict(i[1],i[0])
-                s = settings()
-                if s.get("debug",False):
-                    #DEBUG
-                    print(s.__dict__)
-                    (x,y,w,h) = i[0]
-                    cv2.rectangle(i[2],(x,y),(x+w,y+h),(0,255,0),2)
-                    cv2.putText(i[2],label["label"],(x,y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),lineType=cv2.LINE_AA)
-                    cv2.imshow("feed",i[2])
-                    cv2.waitKey(1)
-                    #DEBUG
-                yield label
+            i = self.__fetch_generator()
+            num = i[-1]
+            print(len(i))
+            json_list = {"num_faces":0}
+            if i[-1] > 0:
+                json_list["num_faces"] = num
+                json_list["faces"] = []
+                for idx in range(num):
+                    label = self.predict(i[1],i[0])
+                    s = settings()
+                    if s.get("debug",False):
+                        #DEBUG
+                        print(s.__dict__)
+                        (x,y,w,h) = i[0]
+                        cv2.rectangle(i[2],(x,y),(x+w,y+h),(0,255,0),2)
+                        cv2.putText(i[2],label["label"],(x,y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),lineType=cv2.LINE_AA)
+                        cv2.imshow("feed",i[2])
+                        cv2.waitKey(1)
+                        #DEBUG
+                    json_list["faces"].append(label)
+                    i = self.__fetch_generator()
+
+            yield json_list
