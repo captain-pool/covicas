@@ -6,4 +6,4 @@ saved_model.yml
 *.json
 *.swp
 *.swo
-
+*.bz2
