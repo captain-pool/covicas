@@ -5,3 +5,8 @@ saved_model.yml
 *.dat
 *.json
 *.txt
+*.swp
+*.swo
+
+
+

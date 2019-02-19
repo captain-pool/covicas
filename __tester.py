@@ -3,10 +3,10 @@ from covicas.face_extract import Extract
 from covicas.api import Response
 import cv2
 from covicas.settings import settings
+print("Booting Up ...")
 s = settings("abcd.json")
 #s.set("debug",True)
-print("Booting Up... ",end = "")
-e = Extract(channel = "GRAY")
+e = Extract(source = 1,channel = "GRAY")
 m = lc(type = lc.EXEC,frame_gen = e,trained_model = "saved_model.yml")
 gen = m.read()
 print("[READY]")

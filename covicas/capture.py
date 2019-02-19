@@ -16,11 +16,13 @@ class Capture:
                 break
             i = next(self.__fg)
             if self.__cap == 0:
-                if len(i) == 3:
+                if len(i) == 4:
                     (x,y,w,h) = i[0]
                     cv2.rectangle(i[2],(x,y),(x+w,y+h),(0,255,0),2)
                     face = i[1]
                     i = i[2]
+                else:
+                    i = i[0]
                 cv2.imshow("capture",i)
                 if cv2.waitKey(1)&0xFF == ord("q"):
                     cv2.destroyAllWindows()

@@ -1,10 +1,13 @@
 from flask import Flask,jsonify
+from flask_cors import CORS,cross_origin
 class Response:
     def __init__(self,settings = {},generator = None):
         self.gen = generator
         self.app = Flask(__name__)
+        CORS(self.app,support_credentials = True)
         self.route_set = False
         self.settings = settings
+    @cross_origin(support_credentials = True)
     def __fetcher(self):
         return jsonify(next(self.gen))
     def run(self,target = "/",method = ["get"]):
