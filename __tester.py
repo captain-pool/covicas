@@ -18,16 +18,16 @@ def main(argv):
             cam_num = int(FLAGS.cam)
         except:
             raise ValueError    
-        print("Booting Up ...")
-        s = settings(FLAGS.settings)
-        #s.set("debug",True)
-        e = Extract(source = cam_num,channel = "GRAY",raspi = raspi)
-        m = lc(type = lc.EXEC,frame_gen = e,trained_model = "saved_model.yml")
-        gen = m.read()
-        print("[READY]")
-        r = Response(generator = gen,settings = s)
-        r.run()
-        if s.get("debug",False):
-            cv2.destroyAllWindows()
+    print("Booting Up ...")
+    s = settings(FLAGS.settings)
+    #s.set("debug",True)
+    e = Extract(source = cam_num,channel = "GRAY",raspi = raspi)
+    m = lc(type = lc.EXEC,frame_gen = e,trained_model = "saved_model.yml")
+    gen = m.read()
+    print("[READY]")
+    r = Response(generator = gen,settings = s)
+    r.run()
+    if s.get("debug",False):
+        cv2.destroyAllWindows()
 if __name__ == "__main__":
     app.run(main)
