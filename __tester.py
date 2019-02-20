@@ -21,7 +21,6 @@ def main(argv):
         print("Booting Up ...")
         s = settings(FLAGS.settings)
         #s.set("debug",True)
-        print(raspi,cam_num)
         e = Extract(source = cam_num,channel = "GRAY",raspi = raspi)
         m = lc(type = lc.EXEC,frame_gen = e,trained_model = "saved_model.yml")
         gen = m.read()
