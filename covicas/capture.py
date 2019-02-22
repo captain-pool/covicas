@@ -10,7 +10,7 @@ class Capture:
             self.__target_dir = target_dir
     def capture(self):
         self.__cap = 1
-    def show(self):
+    def show(self,cap_key = "c",quit_key = "q",auto_cap = False):
         while True:
             if self.__break:
                 break
@@ -24,7 +24,11 @@ class Capture:
                 else:
                     i = i[0]
                 cv2.imshow("capture",i)
-                if cv2.waitKey(1)&0xFF == ord("q"):
+                code = cv2.waitKey(1)&0xFF
+                if code == ord(cap_key):
+                    if auto_cap:
+                        self.capture()
+                if code == ord(quit_key):
                     cv2.destroyAllWindows()
                     break
             else:

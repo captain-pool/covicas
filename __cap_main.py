@@ -17,18 +17,5 @@ if __name__ == "__main__":
     if not os.path.exists(os.path.join(db_folder,name)):
         os.mkdir(os.path.join(db_folder,name))
     cap = Capture(target_dir = os.path.join(db_folder,name))
-    t1 = threading.Thread(target = cap.show)
-    t1.start()
-    orig_settings = termios.tcgetattr(sys.stdin)
-    tty.setraw(sys.stdin)
-    x = 0
-    print("PRESS <ESC> to exit.")
-    while x != chr(27):
-        x = sys.stdin.read(1)[0]
-        sys.stdout.flush()
-        if x == "c":
-            cap.capture()
+    cap.show(auto_cap = True)
     cap.close()
-    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, orig_settings)
-    print()
-        
