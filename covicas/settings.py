@@ -15,9 +15,10 @@ class settings:
         if os.path.exists(_json) and not os.path.isdir(_json) and os.path.getsize(_json)>0:
             with open(_json,"r") as f:
                 self._json = json.load(f)
-        self._fp = open(_json,"w")
+        self._fp = open(_json,"a")
     #    settings.__count += 1
     def __del__(self):
+        self._fp.truncate(0)
         json.dump(self._json,self._fp)
         self._fp.close()
     def get(self,key,default = None):

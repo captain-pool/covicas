@@ -90,7 +90,7 @@ class LBPHClassifier:
         except:
             raise
     def _read_live_frames(self):
-        
+        s = settings() 
         while True:
             i = self.__fetch_generator()
             num = i[-1]
@@ -101,7 +101,6 @@ class LBPHClassifier:
                 json_list["faces"] = []
                 for idx in range(num):
                     label = self.predict(i[1],i[0])
-                    s = settings()
                     if s.get("debug",False):
                         #DEBUG
                         print(s.__dict__)
@@ -114,4 +113,5 @@ class LBPHClassifier:
                     json_list["faces"].append(label)
                     i = self.__fetch_generator()
 
+            json_list["cam_num"] = s.get("CAM_NUM",0)
             yield json_list

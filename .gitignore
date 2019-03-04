@@ -7,3 +7,4 @@ saved_model.yml
 *.swp
 *.swo
 *.bz2
+frontend/
