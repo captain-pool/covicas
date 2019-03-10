@@ -83,6 +83,7 @@ class LBPHClassifier:
         return_dict["y"] = bb[1]
         return_dict["w"] = bb[2]
         return_dict["h"] = bb[3]
+        return_dict["camera"] = sett.get("CAM_NUM",1)
         return return_dict
     def __fetch_generator(self):
         try:
@@ -112,6 +113,4 @@ class LBPHClassifier:
                         #DEBUG
                     json_list["faces"].append(label)
                     i = self.__fetch_generator()
-
-            json_list["cam_num"] = s.get("CAM_NUM",0)
             yield json_list
