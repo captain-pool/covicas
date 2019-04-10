@@ -1,10 +1,16 @@
 import json
 import os
 from .settings import settings
+import signal
 class Database:
   def __init__(self):
     self.settings = settings()
     self.db_name = self.settings.get("db_name", "database.json")
+    a = signal.signal(signal.SIGINT, self._handler)
+    self._keyboard_interrupt = False
+  def _handler(self, signum, frame):
+    self._keyboard_interrupt = True
+    print("\n" + "-"*30 + "\n[Exitting] . . . ")
   def _read(self):
     try:
       assert os.path.exists(self.db_name)
@@ -26,6 +32,8 @@ class Database:
    while True:
     object_ = self._read()
     curr_len = len(object_)
+    if self._keyboard_interrupt:
+      break
     if curr_len == prev_len:
       continue
     for i in object_:
