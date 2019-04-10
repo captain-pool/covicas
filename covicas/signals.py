@@ -14,5 +14,4 @@ class Handler:
        print("WARNING: Object \"%s\" is not Callable. Ignoring Exection..."%func)
   def register(self, func):
     self._functions.append(func)
-    print(self._functions)
     return func
