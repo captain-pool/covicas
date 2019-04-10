@@ -1,14 +1,15 @@
 import json
 import os
 from .settings import settings
-import signal
+from .signals import Handler
 class Database:
   def __init__(self):
     self.settings = settings()
     self.db_name = self.settings.get("db_name", "database.json")
-    a = signal.signal(signal.SIGINT, self._handler)
     self._keyboard_interrupt = False
-  def _handler(self, signum, frame):
+    handler = Handler()
+    handler.register(self._handler)
+  def _handler(self):
     self._keyboard_interrupt = True
     print("\n" + "-"*30 + "\n[Exitting] . . . ")
   def _read(self):

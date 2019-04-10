@@ -1,19 +1,22 @@
 from covicas.model import LBPHClassifier as lc
 from covicas.face_extract import Extract
 from covicas.api import Response
+from covicas.signals import Handler
 import cv2
-import signal
 from absl import app,flags
 from covicas.settings import settings
+handler = Handler()
 FLAGS = flags.FLAGS
 flags.DEFINE_string("cam","0","<WebCamera Number>/ raspi")
 flags.DEFINE_string("settings","abcd.json","Settings File to use")
-def handler(num,frame):
+
+@handler.register
+def handler():
     print(" User Interrupt. Exiting ... ")
     s = settings()
+    s.close()
     del(s)
     exit(0)
-signal.signal(signal.SIGINT,handler)
 def main(argv):
     del argv
     raspi = False

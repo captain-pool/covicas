@@ -25,4 +25,7 @@ class settings:
         return self._json.get(key,default)
     def set(self,key,val):
         self._json[key] = val
-        
+    def close(self):
+        self._fp.truncate(0)
+        json.dump(self._json,self._fp)
+        self._fp.close() 
