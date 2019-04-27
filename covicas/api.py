@@ -1,4 +1,5 @@
 from .settings import settings
+from .lazy_loader import LazyLoader
 import json
 from paho.mqtt.client import Client
 class Response:
@@ -6,39 +7,43 @@ class Response:
     self.gen = generator
     self.settings = settings()
     self.app = None
+    self.modules = LazyLoader()
     self.client_list = []
     if master:
       # Lazy Loading For Master Node
-      from db_plugin import Database
-      from flask import Flask, jsonify
-      from flask_cors import CORS
-      from datetime import datetime
-      
+      self.modules.import_("Database", parent=".db_plugin", return_=False)
+      self.modules.import_("Flask", parent="flask", return_=False)
+      self.modules.import_("jsonify", parent="flask", return_=False)
+      self.modules.import_("CORS", parent="flask_cors", return_=False)
+      self.modules.import_("datetime", parent="datetime", return_=False)
+      globals().update(self.modules.import_dict)
       self.route_set = False
       self.app = Flask(__name__)
       CORS(self.app)
       self.database_ = Database()
     else:
-      IP = kwargs.get("IP", "localhost")
+      IP = kwargs.get("IP", "127.0.0.1")
       self.client_ = Client()
       try:
         self.client_.connect(IP, self.settings.get("mqtt_port",1883), self.settings.get("mqtt_timeout", 60))
       except ConnectionRefusedError:
         if self.settings.get("debug", False):
           raise
-      print("Start mosquitto service on system.")
+        raise OSError("Start mosquitto service on system.")
     self.master = master
     self.message_queue = []
   def __publish(self):
     while True:
       v = next(self.gen)
-      self.client.publish("topic/camera",json.dumps(v))
+      self.client_.publish("topic/camera",json.dumps(v))
   def __on_connect(self, client, userdata, flags, rc):
     client.subscribe("topic/camera")
   def __on_message(self, client, userdata, msg):
-    data = msg.payload.decode()
+    data = json.loads(msg.payload.decode())
+    data["timestamp"] = str(datetime.now())
+    self.database_.store(data)
     try:
-      self.message_queue.append(json.loads(data))
+      self.message_queue.append(data)
     except:
       if settings.get("debug"):
         raise
@@ -51,11 +56,10 @@ class Response:
     except:
       if self.settings.get("debug", False):
         raise
-    data["timestamp"] = str(datetime.now())
     return jsonify(data)
 
   def __subscribe(self):
-    ip_list = self.setttings.get("slaves")
+    ip_list = self.settings.get("slaves", ["127.0.0.1"])
     for ip in ip_list:
       client = Client()
       client.connect(ip, 1883, self.settings.get("mqtt_timeout", 60))
@@ -76,6 +80,7 @@ class Response:
       self.__publish()
     else:
       if not self.route_set:
-        self.app.route(target="/", methods=["GET"])(self.__fetcher)
+        self.app.route(rule="/", methods=["GET"])(self.__fetcher)
+        self.__subscribe()
         self.route_set = True
-      self.app.run(host = self.settings.get("host","127.0.0.1"),port = self.settings.get("port",8000),debug = self.settings.get("debug1",False))
+      self.app.run(host=self.settings.get("host","127.0.0.1"), port=self.settings.get("port",8000), debug=self.settings.get("debug1",False))
