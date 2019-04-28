@@ -18,8 +18,8 @@ To get the list of parameters.
 ## Setting Up
 -  On both the Master and the Slaves:
 ```bash
-      bash ./opencv_install.sh
-      sudo apt install mosquitto
+bash ./opencv_install.sh
+sudo apt install mosquitto
 ```
 
 ## Starting Up the network
@@ -33,7 +33,7 @@ On the Master:
 python3 main.py --master
 ```
 
-To see the logs, run
+To view the logs,
 ```bash
 python3 logger.py
 ```
