@@ -1,11 +1,8 @@
-from covicas.model import LBPHClassifier as lc
-from covicas.face_extract import Extract
-from covicas.api import Response
+from covicas.lazy_loader import LazyLoader
 from covicas.signals import Handler
-import cv2
 from absl import app, flags
-from covicas.settings import settings
 handler = Handler()
+lazy_ = LazyLoader()
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean(
     "master",
@@ -17,11 +14,14 @@ response = None
 @handler.register
 def handler():
     print(" User Interrupt. Exiting ... ")
-    s = settings()
-    s.close()
+    try:
+        s = settings()
+        s.close()
+        del(s)
+    except:
+        pass
     if not response is None and hasattr(response, 'close'):
         response.close()
-    del(s)
     exit(0)
 
 
@@ -38,6 +38,12 @@ def main(argv):
         except BaseException:
             raise ValueError
     print("Booting Up ...")
+    lazy_.import_("cv2", return_=False)
+    lazy_.import_("LBPHClassifier", alias="lc", parent="covicas.model", return_=False)
+    lazy_.import_("Extract", parent="covicas.face_extract", return_=False)
+    lazy_.import_("Response", parent="covicas.api", return_=False)
+    lazy_.import_("settings", parent="covicas.settings", return_=False)
+    globals().update(lazy.import_dict)
     s = settings(FLAGS.settings)
     # s.set("debug",True)
     gen = None
