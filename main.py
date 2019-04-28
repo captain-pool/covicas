@@ -43,7 +43,7 @@ def main(argv):
     lazy_.import_("Extract", parent="covicas.face_extract", return_=False)
     lazy_.import_("Response", parent="covicas.api", return_=False)
     lazy_.import_("settings", parent="covicas.settings", return_=False)
-    globals().update(lazy.import_dict)
+    globals().update(lazy_.import_dict)
     s = settings(FLAGS.settings)
     # s.set("debug",True)
     gen = None
