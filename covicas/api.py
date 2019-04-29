@@ -60,7 +60,7 @@ class Response:
                 raise
 
     def __fetcher(self):
-        data = {"num_faces": 0}
+        data = {"num_faces": 0, "timestamp": str(datetime.now())}
         try:
             data = self.message_queue.pop()
         except IndexError:
