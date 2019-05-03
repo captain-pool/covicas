@@ -2,7 +2,7 @@ from .settings import settings
 from .lazy_loader import LazyLoader
 import json
 from paho.mqtt.client import Client
-
+from collections import deque
 
 class Response:
     def __init__(self, generator=None, master=False, **kwargs):
@@ -39,7 +39,7 @@ class Response:
                     raise
                 raise OSError("Start mosquitto service on system.")
         self.master = master
-        self.message_queue = []
+        self.message_queue = deque()
 
     def __publish(self):
         while True:
@@ -55,6 +55,8 @@ class Response:
         self.database_.store(data)
         try:
             self.message_queue.append(data)
+            if self.settings.get("MAX_MESSAGE_QUEUE", 1000) == len(self.message_queue): 
+              self.message_queue.popleft()
         except BaseException:
             if settings.get("debug"):
                 raise
