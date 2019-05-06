@@ -70,6 +70,7 @@ class Response:
         except BaseException:
             if self.settings.get("debug", False):
                 raise
+        self.database_.store(data)
         return jsonify(data)
 
     def __subscribe(self):
