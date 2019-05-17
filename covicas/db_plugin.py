@@ -1,8 +1,9 @@
 import json
 import os
-from .settings import settings, singleton
+from .settings import settings
 from .signals import Handler
 import lockfile
+import time
 class Database:
     def __init__(self):
         self.settings = settings()
@@ -19,6 +20,7 @@ class Database:
             assert os.path.exists(self.db_name)
             with lockfile.FileLock(self.db_name), open(self.db_name, "r") as f:
                 obj_ = json.load(f)
+                time.sleep(self.settings.get("delay",0.01))
         except BaseException:
             obj_ = []
         return obj_
@@ -30,7 +32,7 @@ class Database:
             if int(data["num_faces"]) != 0:
                 object_.append(self._db_queue.pop())
                 json.dump(object_, f)
-
+            time.sleep(self.settings.get("delay",0.01))
     def display(self, follow=False):
         assert os.path.exists(self.db_name)
         prev_len = 0

@@ -85,13 +85,16 @@ class LBPHClassifier:
                 raise DataBaseNotBuiltError
         label, conf = self.model.predict(frame)
         return_dict = {}
-        return_dict["label"] = self.__lmap.get(str(label), None)
-        return_dict["confidence"] = conf
-        return_dict["x"] = bb[0]
-        return_dict["y"] = bb[1]
-        return_dict["w"] = bb[2]
-        return_dict["h"] = bb[3]
-        return_dict["camera"] = sett.get("CAM_NUM", 1)
+        if conf > sett.get("confidence_threshold", 60):
+            return_dict["label"] = self.__lmap.get(str(label), None)
+            return_dict["confidence"] = conf
+            return_dict["x"] = bb[0]
+            return_dict["y"] = bb[1]
+            return_dict["w"] = bb[2]
+            return_dict["h"] = bb[3]
+            return_dict["camera"] = sett.get("CAM_NUM", 1)
+        else:
+            return_dict["num_faces"] = 0
         return return_dict
 
     def __fetch_generator(self):
