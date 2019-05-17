@@ -1,9 +1,8 @@
 import json
 import os
-from .settings import settings
+from .settings import settings, singleton
 from .signals import Handler
-
-
+import lockfile
 class Database:
     def __init__(self):
         self.settings = settings()
@@ -11,14 +10,14 @@ class Database:
         self._keyboard_interrupt = False
         handler = Handler()
         handler.register(self._handler)
-
+        self._db_queue = []
     def _handler(self):
         self._keyboard_interrupt = True
 
     def _read(self):
         try:
             assert os.path.exists(self.db_name)
-            with open(self.db_name, "r") as f:
+            with lockfile.FileLock(self.db_name), open(self.db_name, "r") as f:
                 obj_ = json.load(f)
         except BaseException:
             obj_ = []
@@ -26,9 +25,10 @@ class Database:
 
     def store(self, data):
         object_ = self._read()
-        with open(self.db_name, "w") as f:
+        self._db_queue.append(data)
+        with lockfile.FileLock(self.db_name), open(self.db_name, "w") as f:
             if int(data["num_faces"]) != 0:
-                object_.append(data)
+                object_.append(self._db_queue.pop())
                 json.dump(object_, f)
 
     def display(self, follow=False):
