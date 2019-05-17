@@ -84,8 +84,9 @@ class LBPHClassifier:
             if not self.__lmap:
                 raise DataBaseNotBuiltError
         label, conf = self.model.predict(frame)
-        return_dict = {}
-        if conf > sett.get("confidence_threshold", 60):
+        return_dict = None
+        if float(conf) > sett.get("confidence", 0.0):
+            return_dict = {}
             return_dict["label"] = self.__lmap.get(str(label), None)
             return_dict["confidence"] = conf
             return_dict["x"] = bb[0]
@@ -93,8 +94,6 @@ class LBPHClassifier:
             return_dict["w"] = bb[2]
             return_dict["h"] = bb[3]
             return_dict["camera"] = sett.get("CAM_NUM", 1)
-        else:
-            return_dict["num_faces"] = 0
         return return_dict
 
     def __fetch_generator(self):
@@ -115,6 +114,15 @@ class LBPHClassifier:
                 json_list["faces"] = []
                 for idx in range(num):
                     label = self.predict(i[1], i[0])
+                    if label is None:
+                        if json_list["num_faces"] > 0:
+                            json_list["num_faces"] -= 1
+                        if json_list["num_faces"] <= 0:
+                            try:
+                                del(json_list["faces"])
+                            except:
+                                pass
+                        continue
                     if s.get("debug", False):
                         # DEBUG
                         print(s.__dict__)

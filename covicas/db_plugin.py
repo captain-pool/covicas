@@ -1,4 +1,4 @@
-import json
+from tinydb import TinyDB, Query
 import os
 from .settings import settings
 from .signals import Handler
@@ -8,6 +8,8 @@ class Database:
     def __init__(self):
         self.settings = settings()
         self.db_name = self.settings.get("db_name", "database.json")
+        self.db_ = TinyDB(self.db_name)
+        self.query_ = Query()
         self._keyboard_interrupt = False
         handler = Handler()
         handler.register(self._handler)
@@ -18,21 +20,15 @@ class Database:
     def _read(self):
         try:
             assert os.path.exists(self.db_name)
-            with lockfile.FileLock(self.db_name), open(self.db_name, "r") as f:
-                obj_ = json.load(f)
-                time.sleep(self.settings.get("delay",0.01))
+            obj_ = self.db_.all()
         except BaseException:
             obj_ = []
         return obj_
 
     def store(self, data):
-        object_ = self._read()
         self._db_queue.append(data)
-        with lockfile.FileLock(self.db_name), open(self.db_name, "w") as f:
-            if int(data["num_faces"]) != 0:
-                object_.append(self._db_queue.pop())
-                json.dump(object_, f)
-            time.sleep(self.settings.get("delay",0.01))
+        if int(data["num_faces"]) != 0:
+            self.db_.insert(data)
     def display(self, follow=False):
         assert os.path.exists(self.db_name)
         prev_len = 0
