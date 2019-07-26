@@ -7,10 +7,16 @@ sudo apt-get install libgtk2.0-dev libgtk-3-dev
 sudo apt-get install libatlas-base-dev gfortran
 sudo apt-get install python2.7-dev python3-dev python3-pip
 cd $HOME
-wget -O opencv.zip https://github.com/Itseez/opencv/archive/3.3.0.zip
-unzip opencv.zip
-wget -O opencv_contrib.zip https://github.com/Itseez/opencv_contrib/archive/3.3.0.zip
-unzip opencv_contrib.zip
+if [[ ! -f opencv.zip ]]
+then
+  wget -O opencv.zip https://github.com/Itseez/opencv/archive/3.3.0.zip
+  unzip opencv.zip
+fi
+if [[ ! -f opencv_contrib.zip ]]
+then
+  wget -O opencv_contrib.zip https://github.com/Itseez/opencv_contrib/archive/3.3.0.zip
+  unzip opencv_contrib.zip
+fi
 cd $OLDPWD
 pip3 install -r requirements.txt
 cd $HOME/opencv-3.3.0/
