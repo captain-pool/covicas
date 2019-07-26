@@ -11,6 +11,7 @@ wget -O opencv.zip https://github.com/Itseez/opencv/archive/3.3.0.zip
 unzip opencv.zip
 wget -O opencv_contrib.zip https://github.com/Itseez/opencv_contrib/archive/3.3.0.zip
 unzip opencv_contrib.zip
+cd $OLDPWD
 pip3 install -r requirements.txt
 cd $HOME/opencv-3.3.0/
 mkdir build
